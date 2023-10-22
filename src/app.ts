@@ -12,6 +12,7 @@ import {
   paymentsRouter,
   hotelsRouter,
   bookingRouter,
+  activitiesRouter,
 } from '@/routers';
 import { loadEnv, connectDb, disconnectDB } from '@/config';
 
@@ -30,6 +31,7 @@ app
   .use('/payments', paymentsRouter)
   .use('/hotels', hotelsRouter)
   .use('/booking', bookingRouter)
+  .use('/activities', activitiesRouter)
   .use(handleApplicationErrors);
 
 export function init(): Promise<Express> {
@@ -41,6 +43,4 @@ export async function close(): Promise<void> {
   await disconnectDB();
 }
 
-
 export default app;
-
