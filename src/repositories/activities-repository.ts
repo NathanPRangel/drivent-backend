@@ -66,5 +66,3 @@ export const activitiesRepository = {
   findActivityById,
 
 };
-
-

@@ -121,6 +121,8 @@ describe('GET /hotels', () => {
       await createPayment(ticket.id, ticketType.price);
 
       const createdHotel = await createHotel();
+      await createRoomWithHotelId(createdHotel.id);
+      await createRoomWithHotelId(createdHotel.id);
 
       const response = await server.get('/hotels').set('Authorization', `Bearer ${token}`);
 
@@ -131,6 +133,8 @@ describe('GET /hotels', () => {
           id: createdHotel.id,
           name: createdHotel.name,
           image: createdHotel.image,
+          capacityAvailable: 6,
+          accommodations: 'Triple',
           createdAt: createdHotel.createdAt.toISOString(),
           updatedAt: createdHotel.updatedAt.toISOString(),
         },
