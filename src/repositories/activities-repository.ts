@@ -19,8 +19,8 @@ async function findActivities() {
           name: true
         }
       }
-
-    }
+    },
+    orderBy:{id:'asc'}
   })
 }
 
@@ -58,7 +58,6 @@ async function findActivityById(activityId: number) {
     }
   })
 }
-
 
 export const activitiesRepository = {
   findActivities,
