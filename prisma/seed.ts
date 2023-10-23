@@ -3,14 +3,14 @@ import dayjs from "dayjs";
 import { string } from "joi";
 const prisma = new PrismaClient();
 
-async function createTicketTypes() {
-  await createTicketType(false, true, "Presencial + Com Hotel");
-  await createTicketType(false, false, "Presencial + Sem Hotel");
-  await createTicketType(true, false, "Online");
+async function createTicketTypes(tx: Prisma.TransactionClient) {
+  await createTicketType(tx, false, true, "Presencial + Com Hotel");
+  await createTicketType(tx, false, false, "Presencial + Sem Hotel");
+  await createTicketType(tx, true, false, "Online");
 }
 
-async function createTicketType(isRemote: boolean, includesHotel: boolean, name: string) {
-  return prisma.ticketType.create({
+async function createTicketType(tx: Prisma.TransactionClient, isRemote: boolean, includesHotel: boolean, name: string) {
+  return tx.ticketType.create({
     data: {
       name: name,
       price: calculatePrice(isRemote, includesHotel),
@@ -169,6 +169,31 @@ async function createActivities(tx: Prisma.TransactionClient, eventId: number) {
   })
 }
 
+async function createHotel(tx: Prisma.TransactionClient, name: string, image: string) {
+  return tx.hotel.create({
+    data: { name, image },
+  });
+}
+
+async function createHotelRoom(tx: Prisma.TransactionClient, name: string, hotelId: number, capacity = 3) {
+  return tx.room.create({
+    data: { name, hotelId, capacity },
+  });
+}
+
+async function crateHotelWithRooms(tx: Prisma.TransactionClient) {
+  const hotel1 = await createHotel(tx, 'Driven Resort', 'https://media-cdn.tripadvisor.com/media/photo-s/16/1a/ea/54/hotel-presidente-4s.jpg');
+  const hotel2 = await createHotel(tx, 'Driven Palace', 'https://cf.bstatic.com/xdata/images/hotel/max1024x768/496718760.jpg?k=608ceb5268219094ffb5f99c00dd1b869daf59485ca2ce071c49a9bd2feeba4f&o=&hp=1');
+
+  await createHotelRoom(tx, '101', hotel1.id);
+  await createHotelRoom(tx, '102', hotel1.id, 2);
+  await createHotelRoom(tx, '103', hotel1.id, 1);
+
+  await createHotelRoom(tx, '201', hotel2.id, 1);
+  await createHotelRoom(tx, '202', hotel2.id);
+  await createHotelRoom(tx, '203', hotel2.id);
+}
+
 async function main() {
   await prisma.$transaction(async (tx) => {
     let event = await tx.event.findFirst();
@@ -185,16 +210,26 @@ async function main() {
       });
     }
 
-    const room = await tx.room.findFirst();
+    const eventRoom = await tx.eventRoom.findFirst();
 
-    if (!room) {
+    if (!eventRoom) {
       await createActivities(tx, event.id);
+    }
+
+    const hotel = await tx.hotel.findFirst();
+
+    if (!hotel) {
+      await crateHotelWithRooms(tx)
+    }
+
+    const ticketType = await tx.ticketType.findFirst();
+
+    if (!ticketType) {
+      await createTicketTypes(tx);
     }
 
     return event;
   })
-
-  await createTicketTypes();
 }
 
 main()
