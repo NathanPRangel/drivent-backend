@@ -62,7 +62,7 @@ export function handleApplicationErrors(
     return res.status(httpStatus.PAYMENT_REQUIRED).send(err.message);
   }
 
-  if (err.name === 'CannotBookError' || err.name === 'CannotActivityError') {
+  if (err.name === 'CannotBookError') {
     return res.status(httpStatus.FORBIDDEN).send(err.message);
   }
 

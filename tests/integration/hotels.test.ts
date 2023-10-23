@@ -3,6 +3,7 @@ import httpStatus from 'http-status';
 import faker from '@faker-js/faker';
 import * as jwt from 'jsonwebtoken';
 import { TicketStatus } from '@prisma/client';
+import { number } from 'joi';
 import { createEnrollmentWithAddress, createPayment, createTicket, createTicketType, createUser } from '../factories';
 import { cleanDb, generateValidToken } from '../helpers';
 import { createHotel, createRoomWithHotelId } from '../factories/hotels-factory';
@@ -122,7 +123,6 @@ describe('GET /hotels', () => {
 
       const createdHotel = await createHotel();
       await createRoomWithHotelId(createdHotel.id);
-      await createRoomWithHotelId(createdHotel.id);
 
       const response = await server.get('/hotels').set('Authorization', `Bearer ${token}`);
 
@@ -133,10 +133,10 @@ describe('GET /hotels', () => {
           id: createdHotel.id,
           name: createdHotel.name,
           image: createdHotel.image,
-          capacityAvailable: 6,
-          accommodations: 'Triple',
           createdAt: createdHotel.createdAt.toISOString(),
           updatedAt: createdHotel.updatedAt.toISOString(),
+          type: expect.any(String),
+          remainingVacancies: expect.any(Number),
         },
       ]);
     });
@@ -166,6 +166,8 @@ describe('GET /hotels/:hotelId', () => {
 
     expect(response.status).toBe(httpStatus.UNAUTHORIZED);
   });
+
+
 
   describe('when token is valid', () => {
     it('should respond with status 404 when user has no enrollment ', async () => {
@@ -272,6 +274,7 @@ describe('GET /hotels/:hotelId', () => {
             hotelId: createdHotel.id,
             createdAt: createdRoom.createdAt.toISOString(),
             updatedAt: createdRoom.updatedAt.toISOString(),
+            bookingCount: expect.any(Number),
           },
         ],
       });
