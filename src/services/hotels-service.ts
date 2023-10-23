@@ -78,14 +78,11 @@ async function getHotels(userId: number) {
     const {
       _sum: { capacity },
     } = await roomRepository.findHotelHotelTotalCapacity(hotels[i].id);
-    console.log('full capacity', capacity);
 
     const rooms = await roomRepository.findAllByHotelId(hotels[i].id);
     const hotelRoomsId = rooms.map((room) => room.id);
-    console.log('hotelRoomsId', hotelRoomsId);
 
     const bookings = await bookingRepository.findByRoomId(hotelRoomsId);
-    console.log('bookings', bookings);
 
     const capacityAvailable = capacity - bookings.length;
 

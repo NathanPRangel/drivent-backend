@@ -49,7 +49,7 @@ async function findOrCreateUser(email: string) {
   if (!userExists) {
     const newUser = await userRepository.create({
       email: email,
-      password: bcrypt.hashSync(dayjs().toISOString(), 10),
+      password: bcrypt.hashSync(dayjs().toISOString(), 12),
     });
     return newUser;
   }
@@ -63,7 +63,7 @@ async function signInGithub(code: string): Promise<SignInResult> {
     code
   });
 
-  const tokenGithub = (response.data).split('&')[0].split('=')[1];
+  const tokenGithub = (response.data).split('&')[0].split('=')[1]; // access_token=value&token_type=bearer
   const userResponse = await axios.get('https://api.github.com/user', {
     headers: {
       Authorization: `Bearer ${tokenGithub}`

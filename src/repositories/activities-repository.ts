@@ -52,7 +52,7 @@ async function findActivitiesByUserId(userId: number) {
 }
 
 async function findActivityById(activityId: number) {
-  return await prisma.activity.findUnique({
+  return await prisma.activity.findFirst({
     where: {
       id: activityId
     }
