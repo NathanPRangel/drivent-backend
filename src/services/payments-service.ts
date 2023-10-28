@@ -1,3 +1,4 @@
+import { prisma } from '@/config';
 import { invalidDataError, notFoundError, unauthorizedError } from '@/errors';
 import { CardPaymentParams, PaymentParams } from '@/protocols';
 import { enrollmentRepository, paymentsRepository, ticketsRepository } from '@/repositories';
@@ -32,8 +33,13 @@ async function paymentProcess(ticketId: number, userId: number, cardData: CardPa
     cardLastDigits: cardData.number.toString().slice(-4),
   };
 
-  const payment = await paymentsRepository.createPayment(ticketId, paymentData);
-  await ticketsRepository.ticketProcessPayment(ticketId);
+  const payment = await prisma.$transaction(async (tx) => {
+    const payment = await paymentsRepository.createPayment(ticketId, paymentData, tx);
+    await ticketsRepository.ticketProcessPayment(ticketId, tx);
+
+    return payment;
+  });
+
   return payment;
 }
 
