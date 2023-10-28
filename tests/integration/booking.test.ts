@@ -15,12 +15,19 @@ import {
 } from '../factories';
 import { cleanDb, generateValidToken } from '../helpers';
 import app, { init } from '@/app';
+import redis from '@/config/redis';
 
 beforeAll(async () => {
   await init();
 });
 
 beforeEach(async () => {
+  await cleanDb();
+  await redis.flushAll();
+});
+
+afterAll(async () => {
+  await redis.flushAll();
   await cleanDb();
 });
 
@@ -89,6 +96,13 @@ describe('GET /booking', () => {
       expect(response.body).toEqual({
         id: booking.id,
         Room: {
+          Hotel: {
+            id: expect.any(Number),
+            name: expect.any(String),
+            image: expect.any(String),
+            createdAt: expect.any(String),
+            updatedAt: expect.any(String),
+          },
           id: expect.any(Number),
           name: expect.any(String),
           capacity: expect.any(Number),

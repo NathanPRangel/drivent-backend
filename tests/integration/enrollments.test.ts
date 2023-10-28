@@ -9,10 +9,17 @@ import { createEnrollmentWithAddress, createUser, createhAddressWithCEP } from '
 import { cleanDb, generateValidToken } from '../helpers';
 import { prisma } from '@/config';
 import app, { init } from '@/app';
+import redis from '@/config/redis';
 
 beforeAll(async () => {
   await init();
   await cleanDb();
+});
+
+
+afterAll(async () => {
+  await cleanDb();
+  await redis.flushAll();
 });
 
 const server = supertest(app);

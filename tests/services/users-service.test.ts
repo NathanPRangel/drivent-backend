@@ -4,12 +4,17 @@ import { createUser as createUserSeed, createEvent as createEventSeed } from '..
 import { cleanDb } from '../helpers';
 import { init } from '@/app';
 import { prisma } from '@/config';
+import redis from '@/config/redis';
 import { userService } from '@/services';
 import { duplicatedEmailError } from '@/errors';
 
 beforeAll(async () => {
   await init();
   await cleanDb();
+});
+
+afterAll(async () => {
+  await redis.flushAll();
 });
 
 describe('createUser', () => {

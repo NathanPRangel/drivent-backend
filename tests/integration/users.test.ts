@@ -7,10 +7,16 @@ import { cleanDb } from '../helpers';
 import { duplicatedEmailError } from '@/errors';
 import app, { init } from '@/app';
 import { prisma } from '@/config';
+import redis from '@/config/redis';
 
 beforeAll(async () => {
   await init();
   await cleanDb();
+});
+
+afterAll(async () => {
+  await cleanDb();
+  await redis.flushAll();
 });
 
 const server = supertest(app);
