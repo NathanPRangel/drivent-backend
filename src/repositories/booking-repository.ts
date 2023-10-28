@@ -7,17 +7,25 @@ async function create({ roomId, userId }: CreateBookingParams) {
   });
 }
 
-async function findByRoomId(roomId: number) {
+async function findByRoomId(roomId: number | number[]) {
   return prisma.booking.findMany({
-    where: { roomId },
-    include: { Room: true },
+    where: {
+      roomId: {
+        in: roomId,
+      },
+    },
   });
 }
 
 async function findByUserId(userId: number) {
   return prisma.booking.findFirst({
     where: { userId },
-    include: { Room: true },
+    include: {
+      Room: {
+        include: { Hotel: true }
+      }
+    },
+
   });
 }
 

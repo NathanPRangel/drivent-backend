@@ -1,8 +1,13 @@
-import { Address } from '@prisma/client';
+import { Address, Prisma, PrismaClient } from '@prisma/client';
 import { prisma } from '@/config';
 
-async function upsert(enrollmentId: number, createdAddress: CreateAddressParams, updatedAddress: UpdateAddressParams) {
-  return prisma.address.upsert({
+async function upsert(
+  enrollmentId: number,
+  createdAddress: CreateAddressParams,
+  updatedAddress: UpdateAddressParams,
+  db: PrismaClient | Prisma.TransactionClient = prisma,
+) {
+  return db.address.upsert({
     where: {
       enrollmentId,
     },
